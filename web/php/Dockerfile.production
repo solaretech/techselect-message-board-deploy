@@ -26,7 +26,7 @@ COPY . /var/www/html/
 # set working directory
 WORKDIR /var/www/html
 
-RUN sudo chown -R www-data:www-data /var/www/html/
+RUN chown -R www-data:www-data /var/www/html/
 
 # expose port 80
 EXPOSE 80
