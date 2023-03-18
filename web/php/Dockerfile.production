@@ -12,33 +12,22 @@ COPY ./web/php/php.ini /usr/local/etc/php/
 COPY ./web/php/*.conf /etc/apache2/sites-enabled/
 
 # 必要なパッケージのインストール
-RUN apt -y update \
-    && apt -y upgrade \
-    && apt -y install \
-            nodejs \
-            libpq-dev \
-            unzip \
-            git \
-            libzip-dev \
-            zip
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libpq-dev \
+        postgresql-client \
+    && docker-php-ext-install pdo pdo_pgsql \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# 必要なPHP拡張のインストール
-RUN docker-php-ext-install pdo_pgsql zip
+# copy your application files
+COPY . /var/www/html/
 
-# Apacheの設定
-RUN a2enmod rewrite
+# set working directory
+WORKDIR /var/www/html
 
-# Install composer
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-RUN php -r "unlink('composer-setup.php');"
+# expose port 80
+EXPOSE 80
 
-# ソースコードをコンテナ内部にコピー
-COPY ./web /var/www/html
-
-# # 作業ディレクトリの設定
-# WORKDIR /var/www/html
-
-# ENV APACHE_DOCUMENT_ROOT /var/www/html
-# RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-# RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# start apache
+CMD ["apache2-foreground"]
