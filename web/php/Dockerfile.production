@@ -8,7 +8,7 @@ ARG DB_CONNECTION
 ARG DATABASE_URL
 
 # Dockerコンテナで公開に必要なファイルのコピー
-COPY ./web//php/php.ini /usr/local/etc/php/
+COPY ./web/php/php.ini /usr/local/etc/php/
 COPY ./web/php/*.conf /etc/apache2/sites-enabled/
 
 RUN apt-get update
@@ -25,6 +25,6 @@ COPY ./web /var/www/html
 # 作業ディレクトリの設定
 WORKDIR /var/www/html
 
-ENV APACHE_DOCUMENT_ROOT /home/app/public
+ENV APACHE_DOCUMENT_ROOT /var/www/html
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
