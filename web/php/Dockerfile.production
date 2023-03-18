@@ -11,8 +11,22 @@ ARG DATABASE_URL
 COPY ./web/php/php.ini /usr/local/etc/php/
 COPY ./web/php/*.conf /etc/apache2/sites-enabled/
 
-RUN apt-get update
-RUN docker-php-ext-install pdo_pgsql
+# 必要なパッケージのインストール
+RUN apt -y update \
+    && apt -y upgrade \
+    && apt -y install \
+            nodejs \
+            libpq-dev \
+            unzip \
+            git \
+            libzip-dev \
+            zip
+
+# 必要なPHP拡張のインストール
+RUN docker-php-ext-install pdo_pgsql zip
+
+# Apacheの設定
+RUN a2enmod rewrite
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
